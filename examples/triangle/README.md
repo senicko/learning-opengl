@@ -1,0 +1,1 @@
+Example rendering a triangle
