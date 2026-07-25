@@ -47,15 +47,12 @@ if(NOT BUILD_EXAMPLE STREQUAL "")
     message(STATUS "building examples/${BUILD_EXAMPLE}")
     add_subdirectory("examples/${BUILD_EXAMPLE}")
 else()
-    # directory structure
     set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
     set(INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-    # Recursively find all C++ source files in src dir
     file(GLOB_RECURSE SOURCES "${SRC_DIR}/*.cpp")
     add_executable(${PROJECT_NAME} ${SOURCES} ${VENDOR_DIR}/glad/src/glad.c)
 
-    # Tell CMake to look into /include for local header files.
     target_include_directories(${PROJECT_NAME} PRIVATE ${INC_DIR})
     target_include_directories(${PROJECT_NAME} PRIVATE ${VENDOR_DIR}/glad/include)
 
@@ -67,16 +64,14 @@ else()
         ${CMAKE_DL_LIBS}
     )
 
-    # Copy the assets folder to executable directory
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${PROJECT_SOURCE_DIR}/assets"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
-    )
-
     set_target_properties(${PROJECT_NAME}
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     )
 
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets"
+    )
 endif()

@@ -27,6 +27,7 @@ bool Application::InitializeWindow(const std::string &title, int width,
     if (!glfwInit()) {
         std::cerr << "Critical Error: Failed to initialize GLFW framework."
                   << std::endl;
+        return false;
     }
 
     // Configure OpenGL 4.1 profile

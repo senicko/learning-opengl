@@ -1,20 +1,26 @@
 Playing with graphics programming in OpenGL.
 
-## Building
-
-To build run
-
-```
-cmake -B build && cmake --build build
-```
-
-which creates a binary at `build/bin/learning-opengl`.
+# Running
 
 > Note that this setup was tested on MacOS only, so it might require CMake fixes on other OS.
 
+Simple script for running commands below
+
+```
+./build.sh [--example <example_name>]
+```
+
+## Building
+
+```
+cmake -B build -S . && cmake --build build
+```
+
+creates a binary at `build/bin/learning-opengl`.
+
 ## Examples
 
-Build system supports writing smaller example apps (to play with some specific things in isolated env). To build an example run
+Build system supports writing smaller example apps (to play with some specific things in isolation). To build an example run
 
 ```
 cmake -B build -DBUILD_EXAMPLE=triangle && cmake --build build

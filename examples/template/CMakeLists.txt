@@ -7,7 +7,6 @@ add_executable(
 )
 
 target_include_directories(example_${BUILD_EXAMPLE} PRIVATE "${VENDOR_DIR}/glad/include")
-target_include_directories(example_${BUILD_EXAMPLE} PRIVATE "include")
 
 target_link_libraries(
     example_${BUILD_EXAMPLE} PRIVATE
@@ -21,10 +20,4 @@ target_link_libraries(
 set_target_properties(example_${BUILD_EXAMPLE}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/examples/${BUILD_EXAMPLE}/bin"
-)
-
-add_custom_command(TARGET example_${BUILD_EXAMPLE} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-    "$<TARGET_FILE_DIR:example_${BUILD_EXAMPLE}>/assets"
 )
