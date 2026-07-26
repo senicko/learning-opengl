@@ -70,7 +70,8 @@ std::string Shader::parseShaderFile(const std::string &filePath) {
     std::ifstream stream(filePath);
 
     if (!stream.is_open()) {
-        std::cerr << "failed to open shader file: " << filePath << std::endl
+        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ " << filePath
+                  << std::endl
                   << "error: " << strerror(errno) << std::endl;
         return "";
     }
@@ -79,4 +80,21 @@ std::string Shader::parseShaderFile(const std::string &filePath) {
     buffer << stream.rdbuf();
 
     return buffer.str();
+}
+
+void Shader::setBool(const std::string &name, bool value) const {
+    glUniform1i(glGetUniformLocation(m_program_id, name.c_str()), (int)value);
+}
+
+void Shader::setInt(const std::string &name, int value) const {
+    glUniform1i(glGetUniformLocation(m_program_id, name.c_str()), value);
+}
+
+void Shader::setFloat(const std::string &name, float value) const {
+    glUniform1f(glGetUniformLocation(m_program_id, name.c_str()), value);
+}
+
+void Shader::setVec4(const std::string &name, const glm::vec4 &vec) {
+    glUniform4f(glGetUniformLocation(m_program_id, name.c_str()), vec.x, vec.y,
+                vec.z, vec.w);
 }

@@ -1,9 +1,11 @@
-// clang-format off
 #include "shader.hpp"
+#include <glm/glm.hpp>
+// clang-format off
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 // clang-format on
 #include <iostream>
+#include <string>
 
 void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -59,8 +61,13 @@ int main(int argc, char **argv) {
 
     // Rendering
 
-    Shader triangle_shader("assets/shaders/triangle_vs.glsl",
-                           "assets/shaders/triangle_fs.glsl");
+    std::string vertexPath =
+        std::string(ASSET_PATH) + "shaders/triangle_vs.glsl";
+
+    std::string fragmentPath =
+        std::string(ASSET_PATH) + "shaders/triangle_fs.glsl";
+
+    Shader triangle_shader(vertexPath, fragmentPath);
 
     float triangle_vertices[] = {
         // clang-format off
@@ -70,13 +77,13 @@ int main(int argc, char **argv) {
         // clang-format on
     };
 
-    GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
     GLuint VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
     glBufferData(GL_ARRAY_BUFFER,           // type of the buffer
                  sizeof(triangle_vertices), // size of data in bytes
                  triangle_vertices,         // data
@@ -90,16 +97,15 @@ int main(int argc, char **argv) {
                           (void *)0          // offset = 0
     );
     glEnableVertexAttribArray(0);
-
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     float rect_vertices[] = {
         // clang-format off
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left
+         0.5f,  0.5f, 0.0f, // top right
+         0.5f, -0.5f, 0.0f, // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f,  0.5f, 0.0f  // top left
         // clang-format on
     };
 
@@ -108,13 +114,13 @@ int main(int argc, char **argv) {
         rect_vertices[i] += 0.25f;
     }
 
-    GLuint VAO2;
-    glGenVertexArrays(1, &VAO2);
-    glBindVertexArray(VAO2);
-
     GLuint VBO2;
     glGenBuffers(1, &VBO2);
     glBindBuffer(GL_ARRAY_BUFFER, VBO2);
+
+    GLuint VAO2;
+    glGenVertexArrays(1, &VAO2);
+    glBindVertexArray(VAO2);
     glBufferData(GL_ARRAY_BUFFER, sizeof(rect_vertices), rect_vertices,
                  GL_STATIC_DRAW);
     glVertexAttribPointer(0,        // which vertex attribute (location = 0)
@@ -128,8 +134,8 @@ int main(int argc, char **argv) {
 
     unsigned int rect_indices[] = {
         // clang-format off
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
         // clang-format on
     };
 
@@ -146,14 +152,23 @@ int main(int argc, char **argv) {
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         triangle_shader.bind();
 
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
+
+        glm::vec4 ourColor = glm::vec4(1.0, greenValue, 0.0, 1.0);
+        triangle_shader.setVec4("ourColor", ourColor);
+        triangle_shader.setFloat("time", timeValue);
+
+        // First draw
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        // Second draw
         glBindVertexArray(VAO2);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
