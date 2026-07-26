@@ -61,42 +61,48 @@ int main(int argc, char **argv) {
 
     // Rendering
 
-    std::string vertexPath =
-        std::string(ASSET_PATH) + "shaders/triangle_vs.glsl";
+    Shader triangle_shader(std::string(ASSET_PATH) + "shaders/triangle_vs.glsl",
+                           std::string(ASSET_PATH) +
+                               "shaders/triangle_fs.glsl");
 
-    std::string fragmentPath =
-        std::string(ASSET_PATH) + "shaders/triangle_fs.glsl";
-
-    Shader triangle_shader(vertexPath, fragmentPath);
+    Shader shape_shader(std::string(ASSET_PATH) + "shaders/shape_vs.glsl",
+                        std::string(ASSET_PATH) + "shaders/shape_fs.glsl");
 
     float triangle_vertices[] = {
         // clang-format off
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
+        // points           // colors
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+        0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+        0.0f, 0.5f, 0.0f,   0.0f, 0.0f, 1.0f
         // clang-format on
     };
 
-    GLuint VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    GLuint TriangleVBO;
+    glGenBuffers(1, &TriangleVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, TriangleVBO);
 
-    GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    GLuint TriangleVAO;
+    glGenVertexArrays(1, &TriangleVAO);
+    glBindVertexArray(TriangleVAO);
     glBufferData(GL_ARRAY_BUFFER,           // type of the buffer
                  sizeof(triangle_vertices), // size of data in bytes
                  triangle_vertices,         // data
                  GL_STATIC_DRAW             // set once, use many times
     );
+
     glVertexAttribPointer(0,        // which vertex attribute (location = 0)
                           3,        // size of the vertex attribute
                           GL_FLOAT, // type of the data (vec* in GLSL is float)
                           GL_FALSE, // normalized?
-                          3 * sizeof(float), // stride = 12
+                          6 * sizeof(float), // stride = 12
                           (void *)0          // offset = 0
     );
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
+                          (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -109,18 +115,13 @@ int main(int argc, char **argv) {
         // clang-format on
     };
 
-    // Shift the rectangle a bit
-    for (int i = 0; i < sizeof(rect_vertices) / sizeof(rect_vertices[0]); i++) {
-        rect_vertices[i] += 0.25f;
-    }
+    GLuint RectangleVBO;
+    glGenBuffers(1, &RectangleVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, RectangleVBO);
 
-    GLuint VBO2;
-    glGenBuffers(1, &VBO2);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-
-    GLuint VAO2;
-    glGenVertexArrays(1, &VAO2);
-    glBindVertexArray(VAO2);
+    GLuint RectangleVAO;
+    glGenVertexArrays(1, &RectangleVAO);
+    glBindVertexArray(RectangleVAO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(rect_vertices), rect_vertices,
                  GL_STATIC_DRAW);
     glVertexAttribPointer(0,        // which vertex attribute (location = 0)
@@ -155,23 +156,17 @@ int main(int argc, char **argv) {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        float time = glfwGetTime();
+
         triangle_shader.bind();
-
-        float timeValue = glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-
-        glm::vec4 ourColor = glm::vec4(1.0, greenValue, 0.0, 1.0);
-        triangle_shader.setVec4("ourColor", ourColor);
-        triangle_shader.setFloat("time", timeValue);
-
-        // First draw
-        glBindVertexArray(VAO);
+        triangle_shader.setFloat("time", time);
+        glBindVertexArray(TriangleVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        // Second draw
-        glBindVertexArray(VAO2);
+        shape_shader.bind();
+        shape_shader.setFloat("time", time);
+        glBindVertexArray(RectangleVAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
         glBindVertexArray(0);
 
         glfwSwapBuffers(window);

@@ -1,12 +1,13 @@
 #version 330 core
 
-// Declare the output variable of type vec4
-// that represents the color
+// The input variable from the vertex shader
+in vec3 ourColor;
+
+// Declare the output variable of type vec4 that represents
+// the color. Note that fs will interpolace this value thus
+// we'll get this shading like effect.
 out vec4 FragColor;
 
-// The input variable from the vertex shader
-uniform vec4 ourColor;
-
 void main() {
-    FragColor = ourColor;
+    FragColor = vec4(ourColor, 1.0);
 }
